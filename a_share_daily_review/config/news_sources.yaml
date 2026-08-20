@@ -1,0 +1,141 @@
+# 盘前早报 · 资讯源白名单（阶段1）
+# 原则：真实可靠 > 时效 > 抓眼 > 国外优先
+# 可随时增删；enabled: false 即跳过
+
+time_window:
+  # 相对「运行日」：保留 [前一日 cutoff, 现在] 的条目
+  prev_day_cutoff_hour: 15    # 昨日 15:00 之后
+  prev_day_cutoff_minute: 0
+  timezone: "Asia/Shanghai"
+
+limits:
+  max_fetch_per_source: 15
+  top_n_full: 12              # 完整版条数
+  top_n_brief: 5              # 精简版条数
+  request_timeout_sec: 12
+  max_concurrent: 4           # Mac mini 建议偏低
+
+scoring:
+  # 分类基础分（再乘关键词与时效）
+  category_weight:
+    us_macro: 1.0
+    us_market: 0.95
+    tech: 0.9
+    commodity: 0.85
+    fx: 0.8
+    asia: 0.75
+    cn_flash: 0.55
+  # 标题冲击力关键词（命中加分，可扩展）
+  impact_keywords:
+    - {word: "美联储", score: 3.0}
+    - {word: "Fed", score: 3.0}
+    - {word: "降息", score: 2.5}
+    - {word: "加息", score: 2.5}
+    - {word: "通胀", score: 2.0}
+    - {word: "CPI", score: 2.0}
+    - {word: "非农", score: 2.5}
+    - {word: "英伟达", score: 2.5}
+    - {word: "NVIDIA", score: 2.5}
+    - {word: "纳斯达克", score: 2.0}
+    - {word: "标普", score: 1.8}
+    - {word: "道指", score: 1.5}
+    - {word: "暴跌", score: 2.0}
+    - {word: "暴涨", score: 2.0}
+    - {word: "新高", score: 1.8}
+    - {word: "新低", score: 1.8}
+    - {word: "熔断", score: 3.0}
+    - {word: "制裁", score: 2.5}
+    - {word: "原油", score: 1.5}
+    - {word: "黄金", score: 1.5}
+    - {word: "美元", score: 1.5}
+    - {word: "日经", score: 1.5}
+    - {word: "恒生", score: 1.5}
+    - {word: "财报", score: 1.5}
+    - {word: "裁员", score: 1.5}
+    - {word: "破产", score: 2.0}
+  # 时效：越新越高（小时衰减）
+  recency_half_life_hours: 18
+
+# 源列表：国外为主；国内快讯默认低权重且可关
+sources:
+  # —— 美股 / 宏观 ——
+  - id: cnbc_top
+    name: "CNBC Top News"
+    url: "https://www.cnbc.com/id/100003114/device/rss/rss.html"
+    category: us_market
+    region: overseas
+    enabled: true
+
+  - id: cnbc_economy
+    name: "CNBC Economy"
+    url: "https://www.cnbc.com/id/20910258/device/rss/rss.html"
+    category: us_macro
+    region: overseas
+    enabled: true
+
+  - id: marketwatch_top
+    name: "MarketWatch Top Stories"
+    url: "https://feeds.marketwatch.com/marketwatch/topstories/"
+    category: us_market
+    region: overseas
+    enabled: true
+
+  - id: yahoo_finance
+    name: "Yahoo Finance"
+    url: "https://finance.yahoo.com/news/rssindex"
+    category: us_market
+    region: overseas
+    enabled: true
+
+  - id: bbc_business
+    name: "BBC Business"
+    url: "https://feeds.bbci.co.uk/news/business/rss.xml"
+    category: us_macro
+    region: overseas
+    enabled: true
+
+  - id: fed_press
+    name: "Federal Reserve Press"
+    url: "https://www.federalreserve.gov/feeds/press_all.xml"
+    category: us_macro
+    region: overseas
+    enabled: true
+
+  # —— 科技 ——
+  - id: techcrunch
+    name: "TechCrunch"
+    url: "https://techcrunch.com/feed/"
+    category: tech
+    region: overseas
+    enabled: true
+
+  - id: theverge
+    name: "The Verge"
+    url: "https://www.theverge.com/rss/index.xml"
+    category: tech
+    region: overseas
+    enabled: true
+
+  # —— 商品 / 参考（若源失效可 enabled: false）——
+  - id: investing_commodities
+    name: "Investing.com Commodities"
+    url: "https://www.investing.com/rss/news_301.rss"
+    category: commodity
+    region: overseas
+    enabled: true
+
+  # —— 国内快讯（低权重；无本地 RSS 桥时可先关）——
+  # 启用前请自建 china-finance-rss 或 RSSHub，把 url 改成你的本地地址
+  - id: cls_telegraph
+    name: "财联社电报"
+    url: "http://127.0.0.1:8053/cls/telegraph"
+    category: cn_flash
+    region: domestic
+    enabled: false
+
+  - id: jin10_flash
+    name: "金十快讯"
+    url: "http://127.0.0.1:8053/jin10/flash"
+    category: cn_flash
+    region: domestic
+    enabled: false

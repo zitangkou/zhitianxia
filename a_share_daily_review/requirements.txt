@@ -1,0 +1,25 @@
+# 方案一核心依赖
+akshare>=1.14.0
+baostock>=0.8.8
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7
+seaborn>=0.13
+pyarrow>=14.0
+duckdb>=0.10
+lightgbm>=4.0
+apscheduler>=3.10
+chinese-calendar>=1.8
+requests>=2.28
+pillow>=10.0
+pyyaml>=6.0
+tqdm>=4.65
+python-dateutil>=2.8
+feedparser>=6.0
+httpx>=0.27
+fastapi>=0.110
+uvicorn>=0.27
+
+# 可选（用户本地推荐）
+# ollama  # 通过 ollama pull 安装模型
+# playwright  # 半自动发布时使用

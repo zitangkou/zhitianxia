@@ -1,0 +1,108 @@
+# 方案一 配置文件
+
+project:
+  name: "A股每日自动复盘系统（轻量版）"
+  version: "0.1.0"
+  timezone: "Asia/Shanghai"
+
+paths:
+  root: "."                     # 相对项目根
+  data_raw: "data/raw"
+  data_parquet: "data/parquet"
+  data_db: "data/db"
+  output: "output"
+  logs: "logs"
+  charts: "output/{date}/charts"
+
+data:
+  primary_source: "akshare"     # akshare | baostock
+  retry_times: 2
+  retry_sleep: 1.5
+  request_timeout: 30
+  # 网络不稳定时设为 true，跳过全市场快照/部分板块（指数+涨停仍保留）
+  # 用户本地稳定网络建议设为 false
+  skip_heavy_endpoints: true
+  # 主要关注的指数（akshare 代码）
+  indices:
+    - name: "上证综指"
+      code: "sh000001"
+    - name: "深证成指"
+      code: "sz399001"
+    - name: "创业板指"
+      code: "sz399006"
+    - name: "沪深300"
+      code: "sh000300"
+    - name: "中证500"
+      code: "sh000905"
+    - name: "中证1000"
+      code: "sh000852"
+
+analysis:
+  # 观察池（可后续扩展为动态）
+  watchlist: []
+  # 简单规则参数
+  volume_ratio_threshold: 2.0   # 量比异常
+  pct_change_top_n: 20
+  sector_top_n: 10
+  # 一字板：首次封板时间不晚于该值（HHMMSS）且炸板次数=0
+  yizi_seal_before: "093500"
+  # 开板回封「惊艳」阈值：炸板次数 >= 此值
+  reopen_zhaban_min: 5
+  # 题材/节日/事件关键词（名称或概念命中则提示）
+  # 可随时追加：电影名、节日、政策词、网红梗等
+  theme_keywords:
+    - {keyword: "牛", themes: ["牛相关", "电影/生肖梗"], note: "片名或生肖相关情绪"}
+    - {keyword: "七夕", themes: ["七夕", "情感消费"], note: "七夕节点"}
+    - {keyword: "玫瑰", themes: ["七夕", "鲜花"], note: "七夕配套"}
+    - {keyword: "婚", themes: ["婚庆", "七夕"], note: "婚庆情绪"}
+    - {keyword: "酒", themes: ["白酒", "消费"], note: "消费酒类"}
+    - {keyword: "药", themes: ["医药"], note: "医药情绪"}
+    - {keyword: "芯片", themes: ["半导体"], note: "科技主线"}
+    - {keyword: "机器人", themes: ["机器人"], note: "人形机器人"}
+    - {keyword: "航天", themes: ["商业航天"], note: "航天题材"}
+    - {keyword: "游戏", themes: ["游戏"], note: "游戏传媒"}
+  # 知名游资席位关键词（营业部名称包含则标注绰号，便于文案）
+  famous_seats:
+    - {match: "拉萨", nickname: "拉萨天团"}
+    - {match: "成都", nickname: "成都系"}
+    - {match: "杭州", nickname: "杭州帮"}
+    - {match: "上海", nickname: "上海超短"}
+    - {match: "深圳", nickname: "深圳资金"}
+    - {match: "西安西大街", nickname: "西安西大街"}
+    - {match: "武汉", nickname: "武汉席位"}
+    - {match: "后海", nickname: "深圳后海"}
+    - {match: "深股通", nickname: "深股通"}
+    - {match: "沪股通", nickname: "沪股通"}
+
+llm:
+  enabled: true
+  provider: "ollama"            # ollama | template
+  base_url: "http://localhost:11434"
+  model: "qwen2.5:7b"           # 用户本地推荐 qwen2.5:14b 或 qwen3:14b
+  temperature: 0.7
+  max_tokens: 2048
+  fallback_to_template: true    # 无Ollama时自动用模板
+
+charts:
+  dpi: 150
+  figsize: [10, 6]
+  style: "seaborn-v0_8-whitegrid"
+  font_family: "SimHei"         # 中文字体，用户本地需确保安装
+  watermark: "仅供学习研究 · 不构成投资建议"
+
+scheduler:
+  hour: 15
+  minute: 45
+  morning_hour: 7
+  morning_minute: 30
+  timezone: "Asia/Shanghai"
+
+notify:
+  enabled: false
+  # 预留 webhook / 企业微信 / Telegram
+  webhook_url: ""
+
+publisher:
+  # 半自动：只打包，不自动发
+  auto_publish: false
+  xiaohongshu_draft: true

@@ -1,0 +1,39 @@
+# macOS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+.cursor/
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/.venv/
+**/venv/
+**/.pytest_cache/
+**/*.egg-info/
+**/dist/
+**/build/
+
+# 密钥与本地环境
+.env
+**/.env
+**/.env.*
+!.env.example
+
+# 本项目运行产物（勿入库）
+**/output/
+**/logs/
+**/data/raw/
+**/data/parquet/
+**/data/db/
+**/*.db
+**/*.sqlite3
+
+# 模型与大数据（若本地放置）
+**/models/
+**/*.gguf
+**/*.bin
+
+# Jupyter
+**/.ipynb_checkpoints/
