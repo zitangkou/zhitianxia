@@ -98,9 +98,20 @@ scheduler:
   timezone: "Asia/Shanghai"
 
 notify:
+  # true 时 run_* 结束自动推；也可用命令行 --notify 强制推一次
   enabled: false
-  # 预留 webhook / 企业微信 / Telegram
+  # 兼容单 webhook（无 channels 时使用）
   webhook_url: ""
+  secret: ""                    # 钉钉机器人「加签」密钥，没有则留空
+  msgtype: "markdown"           # markdown | text
+  channels:
+    - type: dingtalk
+      enabled: true
+      # 群机器人 Webhook，勿提交真实地址到公开仓；本地填写或用环境变量
+      webhook: ""               # https://oapi.dingtalk.com/robot/send?access_token=...
+      secret: ""
+      msgtype: "markdown"
+      at_all: false
 
 publisher:
   # 半自动：只打包，不自动发

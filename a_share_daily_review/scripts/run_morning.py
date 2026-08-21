@@ -30,6 +30,7 @@ def parse_args():
     p = argparse.ArgumentParser(description="盘前早报草稿（人工审核后发布）")
     p.add_argument("--date", type=str, default=None, help="业务日期 YYYY-MM-DD")
     p.add_argument("--llm", action="store_true", help="启用 Ollama 中文润色（默认关，省内存）")
+    p.add_argument("--notify", action="store_true", help="推送到钉钉等（读 config notify）")
     return p.parse_args()
 
 
@@ -83,6 +84,20 @@ def main():
         print("\n--- 精简版预览 ---\n")
         print(brief_text)
         print("\n------------------\n")
+
+        # 可选：推送到钉钉等
+        if args.notify or (cfg.get("notify") or {}).get("enabled"):
+            try:
+                from src.notify import push_message
+                body = brief_text
+                if payload.get("llm_text"):
+                    body = payload["llm_text"]
+                title = f"盘前早报 {payload.get('run_date', '')}"
+                push_message(title, body, cfg, force=bool(args.notify))
+                print("已尝试消息推送（钉钉等）")
+            except Exception as e:
+                logger.warning("消息推送失败: %s", e)
+
         return 0
     except Exception as e:
         logger.exception("早报流水线失败: %s", e)

@@ -35,6 +35,7 @@ def parse_args():
     parser.add_argument("--force", action="store_true", help="强制运行（忽略交易日检查）")
     parser.add_argument("--no-save", action="store_true", help="只拉取不落盘")
     parser.add_argument("--no-llm", action="store_true", help="跳过 Ollama 润色")
+    parser.add_argument("--notify", action="store_true", help="推送到钉钉等（读 config notify）")
     parser.add_argument("--mock", action="store_true", help="使用模拟数据（离线调试）")
     return parser.parse_args()
 
@@ -98,6 +99,16 @@ def main():
         print(f"审核草稿: {out_dir / 'review_draft.json'}")
         print("状态: pending_review（请打开审核台人工发布，勿自动发帖）")
         print("=" * 50 + "\n")
+
+        if args.notify or (cfg.get("notify") or {}).get("enabled"):
+            try:
+                from src.notify import push_message
+                body = draft.get("llm_text") or review.summary_text or ""
+                title = f"收盘复盘 {trade_date}"
+                push_message(title, body, cfg, force=bool(args.notify))
+                print("已尝试消息推送（钉钉等）")
+            except Exception as e:
+                logger.warning("消息推送失败: %s", e)
 
         logger.info("复盘流水线完成（含草稿/图表）")
         return 0
